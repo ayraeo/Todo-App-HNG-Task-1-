@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FlowTask — Your Intelligent Todo Manager</title>
+  <meta name="description" content="FlowTask is a beautiful, modern task manager with notes, priorities, and a built-in Pomodoro focus timer to help you get more done." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar" aria-label="Navigation">
+    <div class="sidebar-brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/>
+        </svg>
+      </div>
+      <span class="brand-name">FlowTask</span>
+    </div>
+
+    <nav class="sidebar-nav" aria-label="Task filters">
+      <button class="nav-item active" data-filter="all" id="filter-all">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        All Tasks
+        <span class="nav-badge" id="badge-all">0</span>
+      </button>
+      <button class="nav-item" data-filter="today" id="filter-today">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+        Today
+        <span class="nav-badge" id="badge-today">0</span>
+      </button>
+      <button class="nav-item" data-filter="pending" id="filter-pending">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        Pending
+        <span class="nav-badge" id="badge-pending">0</span>
+      </button>
+      <button class="nav-item" data-filter="completed" id="filter-completed">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        Completed
+        <span class="nav-badge" id="badge-completed">0</span>
+      </button>
+      <button class="nav-item" data-filter="high" id="filter-high">
+        <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        High Priority
+        <span class="nav-badge" id="badge-high">0</span>
+      </button>
+    </nav>
+
+    <div class="sidebar-section-label">Focus Timer</div>
+    <!-- Pomodoro Widget in Sidebar -->
+    <div class="pomodoro-widget" id="pomodoro-widget">
+      <div class="pomodoro-display">
+        <div class="pomodoro-time" id="pomodoro-time" aria-live="polite" aria-label="Pomodoro timer">25:00</div>
+        <div class="pomodoro-label" id="pomodoro-label">Focus Session</div>
+      </div>
+      <div class="pomodoro-ring-wrap">
+        <svg class="pomodoro-ring" viewBox="0 0 120 120" aria-hidden="true">
+          <circle class="ring-track" cx="60" cy="60" r="50"/>
+          <circle class="ring-progress" id="ring-progress" cx="60" cy="60" r="50"/>
+        </svg>
+      </div>
+      <div class="pomodoro-controls">
+        <button class="pomo-btn pomo-btn--reset" id="pomo-reset" title="Reset" aria-label="Reset timer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+        </button>
+        <button class="pomo-btn pomo-btn--play" id="pomo-toggle" aria-label="Start timer">
+          <svg id="pomo-icon-play" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          <svg id="pomo-icon-pause" viewBox="0 0 24 24" fill="currentColor" style="display:none"><rect x="6" y="4" width="4" height="16"/><rect x="14" y="4" width="4" height="16"/></svg>
+        </button>
+        <button class="pomo-btn pomo-btn--skip" id="pomo-skip" title="Skip to break" aria-label="Skip to break">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="5 12 19 12"/><polyline points="13 6 19 12 13 18"/></svg>
+        </button>
+      </div>
+      <div class="pomodoro-focus-task" id="pomodoro-focus-task">No task selected</div>
+    </div>
+
+    <!-- Keyboard Shortcuts Panel -->
+    <div class="shortcuts-panel" aria-label="Keyboard shortcuts">
+      <div class="shortcuts-title">Keyboard Shortcuts</div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">New task</span>
+        <span class="shortcut-key"><span class="kbd">N</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">Close dialog</span>
+        <span class="shortcut-key"><span class="kbd">Esc</span></span>
+      </div>
+      <div class="shortcut-row">
+        <span class="shortcut-label">Start / pause timer</span>
+        <span class="shortcut-key"><span class="kbd">P</span></span>
+      </div>
+    </div>
+
+    <div class="sidebar-stats">
+      <div class="stat-item">
+        <span class="stat-value" id="stat-done">0</span>
+        <span class="stat-label">Done today</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-streak">0</span>
+        <span class="stat-label">Pomodoros</span>
+      </div>
+    </div>
+  </aside>
+
+  <!-- ===== MOBILE HEADER ===== -->
+  <header class="mobile-header" aria-label="Mobile navigation">
+    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation" aria-expanded="false" aria-controls="sidebar">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+    </button>
+    <div class="mobile-brand">FlowTask</div>
+    <button class="mobile-add-btn" id="mobile-add-btn" aria-label="Add task">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+    </button>
+  </header>
+
+  <!-- ===== MAIN CONTENT ===== -->
+  <main class="main-content" id="main-content">
+    <!-- Top Bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <h1 class="page-title" id="page-title">All Tasks</h1>
+        <p class="page-subtitle" id="page-subtitle">Manage and conquer your day</p>
+      </div>
+      <div class="topbar-right">
+        <div class="search-wrap">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="search-input" id="search-input" type="search" placeholder="Search tasks..." aria-label="Search tasks" />
+        </div>
+        <div class="sort-wrap">
+          <label for="sort-select" class="sr-only">Sort tasks</label>
+          <select class="sort-select" id="sort-select" aria-label="Sort tasks">
+            <option value="created">Created</option>
+            <option value="priority">Priority</option>
+            <option value="dueDate">Due Date</option>
+            <option value="title">Title</option>
+          </select>
+        </div>
+        <button class="btn btn--primary add-task-btn" id="add-task-btn" aria-label="Add new task">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          New Task
+        </button>
+      </div>
+    </div>
+
+    <!-- Progress Bar -->
+    <div class="progress-section" aria-label="Task completion progress">
+      <div class="progress-info">
+        <span id="progress-text">0 of 0 tasks completed</span>
+        <span id="progress-pct">0%</span>
+      </div>
+      <div class="progress-bar-wrap" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" aria-labelledby="progress-text" id="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar-fill"></div>
+      </div>
+    </div>
+
+    <!-- Task List -->
+    <div class="task-list" id="task-list" role="list" aria-label="Task list">
+      <!-- Tasks inserted here by JS -->
+    </div>
+
+    <!-- Empty State -->
+    <div class="empty-state" id="empty-state" aria-live="polite">
+      <div class="empty-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      </div>
+      <h2 class="empty-title">All clear!</h2>
+      <p class="empty-desc">No tasks here. Add one to get started.</p>
+      <button class="btn btn--primary" id="empty-add-btn">Add your first task</button>
+    </div>
+  </main>
+
+  <!-- Sidebar Overlay (mobile) -->
+  <div class="sidebar-overlay" id="sidebar-overlay" aria-hidden="true"></div>
+
+  <!-- ===== TASK MODAL (Create / Edit) ===== -->
+  <dialog class="modal" id="task-modal" aria-labelledby="modal-title" closedby="any">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h2 class="modal-title" id="modal-title">New Task</h2>
+        <button class="modal-close" id="modal-close" aria-label="Close dialog">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+
+      <form class="task-form" id="task-form" novalidate>
+        <input type="hidden" id="edit-task-id" />
+
+        <div class="form-group">
+          <label class="form-label" for="task-title">Task Title <span class="required" aria-hidden="true">*</span></label>
+          <input class="form-input" id="task-title" type="text" placeholder="What needs to be done?" required maxlength="150" autocomplete="off" />
+          <span class="input-hint" id="title-count">0 / 150</span>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="task-desc">Description</label>
+          <textarea class="form-textarea" id="task-desc" placeholder="Add more details about this task..." rows="3" maxlength="500"></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group form-group--half">
+            <label class="form-label" for="task-priority">Priority</label>
+            <select class="form-select" id="task-priority">
+              <option value="low">🟢 Low</option>
+              <option value="medium" selected>🟡 Medium</option>
+              <option value="high">🔴 High</option>
+            </select>
+          </div>
+          <div class="form-group form-group--half">
+            <label class="form-label" for="task-due">Due Date</label>
+            <input class="form-input" id="task-due" type="date" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="task-tags">Tags <span class="hint">(comma separated)</span></label>
+          <input class="form-input" id="task-tags" type="text" placeholder="e.g. work, personal, urgent" />
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="task-notes">Notes</label>
+          <textarea class="form-textarea form-textarea--notes" id="task-notes" placeholder="Jot down any related notes, links, or reminders..." rows="4" maxlength="2000"></textarea>
+        </div>
+
+        <div class="modal-actions">
+          <button type="button" class="btn btn--ghost" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="modal-submit">Create Task</button>
+        </div>
+      </form>
+    </div>
+  </dialog>
+
+  <!-- ===== TASK DETAIL MODAL ===== -->
+  <dialog class="modal modal--detail" id="detail-modal" aria-labelledby="detail-title" closedby="any">
+    <div class="modal-content modal-content--detail">
+      <div class="modal-header">
+        <div class="detail-meta">
+          <span class="detail-priority-badge" id="detail-priority-badge">Medium</span>
+          <span class="detail-date" id="detail-date"></span>
+        </div>
+        <div class="modal-header-actions">
+          <button class="icon-btn icon-btn--focus" id="detail-focus-btn" title="Start focus session" aria-label="Start Pomodoro focus session">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          </button>
+          <button class="icon-btn icon-btn--edit" id="detail-edit-btn" title="Edit task" aria-label="Edit task">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          </button>
+          <button class="modal-close" id="detail-close" aria-label="Close dialog">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <h2 class="detail-title" id="detail-title"></h2>
+      <p class="detail-desc" id="detail-desc"></p>
+
+      <div class="detail-tags" id="detail-tags"></div>
+
+      <div class="detail-notes-section" id="detail-notes-section">
+        <h3 class="detail-section-title">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          Notes
+        </h3>
+        <div class="detail-notes" id="detail-notes"></div>
+      </div>
+
+      <div class="detail-footer">
+        <button class="btn btn--danger" id="detail-delete-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+          Delete Task
+        </button>
+        <button class="btn btn--success" id="detail-complete-btn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Mark Complete
+        </button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- ===== DELETE CONFIRM MODAL ===== -->
+  <dialog class="modal modal--confirm" id="confirm-modal" aria-labelledby="confirm-title" closedby="any">
+    <div class="modal-content modal-content--confirm">
+      <div class="confirm-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+      </div>
+      <h2 class="confirm-title" id="confirm-title">Delete Task?</h2>
+      <p class="confirm-desc">This action cannot be undone. The task and all its notes will be permanently removed.</p>
+      <div class="modal-actions">
+        <button class="btn btn--ghost" id="confirm-cancel">Cancel</button>
+        <button class="btn btn--danger" id="confirm-delete">Yes, Delete</button>
+      </div>
+    </div>
+  </dialog>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>
